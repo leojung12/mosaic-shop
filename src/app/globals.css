@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #ffffff; /* 기본 배경: 흰색 */
+  --tile: #f4f4f4; /* 숍 격자 칸 바탕 (흰 배경보다 한 톤 진하게) */
+  --tile-hover: #ebebeb; /* 숍 격자 칸 호버 */
+  --field: #f4f4f4; /* 상세 첫 화면 바탕 (무채색) */
+  --ink: #111111;
+  --ink-inverse: #f5f5f2;
+  --muted: #8a8a8a;
+
+  /* 호버·스크롤로 바뀌는 현재 배경·글자색. 홈 컴포넌트가 <html>에 덮어쓴다. */
+  --current-bg: var(--bg);
+  --current-ink: var(--ink);
+  --current-muted: var(--muted);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --tomato: #111111; /* (예전 토마토색 자리) 무채색으로 통일 */
+  --accent: #1a1a1a; /* 스티커 바탕 */
+}
+
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-ink-inverse: var(--ink-inverse);
+  --color-muted: var(--current-muted);
+  --font-sans: var(--font-gowun), var(--font-pretendard), serif;
+  --font-mono: var(--font-courier), ui-monospace, monospace;
+  --font-serif: var(--font-fell), Georgia, serif;
+  --font-brand: var(--font-brand), Didot, Georgia, serif;
+  --text-label: 11px;
+  --text-body: 14px;
+  --ease-out: var(--ease-out);
+}
+
+/* 레이어 밖에 두어 다른 스타일(예: 프레임워크 기본 화면)이 배경을 덮지 못하게 한다 */
+html {
+  background-color: var(--current-bg);
+  color: var(--current-ink);
+}
+body {
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  word-break: keep-all; /* 한글은 단어 단위로 줄바꿈 */
+  overflow-wrap: break-word;
+}
+@media (prefers-reduced-motion: reduce) {
+  html,
+  html * {
+    transition-duration: 0s !important;
+  }
+}
+
+
+/* 움직이는 장식 (Clock) */
+@keyframes blink {
+  50% {
+    opacity: 0.15;
+  }
+}
+::selection {
+  background: var(--current-ink);
+  color: var(--current-bg);
+}
+
+/* 밑줄이 왼쪽에서 그어지는 링크 호버 */
+@utility hover-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: 0% 1px;
+  transition: background-size 450ms var(--ease-out);
+  padding-bottom: 2px;
+  &:hover {
+    background-position: 0% 100%;
+    background-size: 100% 1px;
+  }
+}
+
+/* 영문 라벨·가격·메뉴 공통 스타일 */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+
+/* 페이지 전환 (React ViewTransition) ---------------------------------- */
+/* 화면 전체(헤더·배경)는 부드럽게 교차 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* 이전 페이지는 살짝 위로 빠지고, 새 페이지는 겹치며 바로 올라온다 (중간에 빈 틈이 없게) */
+::view-transition-old(.page-exit) {
+  animation: 280ms cubic-bezier(0.4, 0, 1, 1) both page-out;
+}
+::view-transition-new(.page-enter) {
+  animation: 520ms cubic-bezier(0.22, 1, 0.36, 1) 40ms both page-in;
+}
+::view-transition-group(*) {
+  will-change: transform;
+}
+/* 홈 오브제 → 상세 이미지: 같은 물건이 그대로 날아가 커진다 */
+::view-transition-group(.morph) {
+  animation-duration: 760ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-image-pair(.morph) {
+  isolation: auto;
+}
+/* 같은 누끼라 겹쳐서 교차: 큰 쪽(상세)의 선명함을 유지하면서 작은 쪽으로 자연스럽게 */
+::view-transition-old(.morph),
+::view-transition-new(.morph) {
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: normal;
+  animation-duration: 760ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-old(.morph) {
+  animation-name: morph-out;
+}
+::view-transition-new(.morph) {
+  animation-name: morph-in;
+}
+@keyframes morph-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes morph-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* 시작 화면은 어두운 사진 위라 헤더·footer 글자를 흰색으로 */
+html[data-home] {
+  --current-bg: #1a1714;
+  --current-ink: #f5f5f2;
+  --current-muted: rgb(245 245 242 / 0.65);
+}
+/* 홈(한 화면짜리 시작 화면)에서는 큰 footer를 숨기고 페이지 안의 사업자 정보 한 줄만 보인다 */
+html[data-home] .site-footer {
+  display: none;
+}
+
+/* 화면 밖 구역은 보일 때 그린다 (페이지 이동·첫 스크롤 때 한 번에 다 그리느라 생기던 걸림 완화) */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+.site-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
