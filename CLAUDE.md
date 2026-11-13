@@ -43,11 +43,10 @@ public/                            이미지 (products/, home/, brand/ …)
 
 같은 파일을 여러 명이 동시에 고치면 충돌이 난다. 자기 담당 파일만 수정한다.
 
-- 김민주 (팀장, 공통): 아래 담당에 없는 전부 — 공통 레이아웃·헤더·푸터, `globals.css`, `src/lib/`, `src/config/`, 회원·주문·결제, `admin/`, `supabase/`, `package.json`
-- 김시현 (홈): `src/app/(site)/page.tsx`, `src/components/home/`
-- 정민규 (목록): `src/app/(site)/shop/`, `src/app/(site)/search/`, `src/components/shop/`
-- 정태두 (상세): `src/app/(site)/product/`, `src/components/product/`, `src/components/review/`
-- 최현민 (안내): `src/app/(site)/info/`, `terms/`, `privacy/`, `src/config/legal.ts`
+- 김민주 (팀장, 공통): 아래 담당에 없는 전부 — 공통 레이아웃(`src/app/layout.tsx`, `src/app/(site)/layout.tsx`), `globals.css`, 헤더·푸터 등 `src/components/` 바로 아래 공통 파일, `src/config/site.ts`·`categories.ts`, `package.json`
+- 김시현 (목록·상세): `src/app/(site)/shop/`, `search/`, `product/`, `src/components/shop/`, `product/`, `review/`
+- 정태두 (백엔드): `src/lib/`, `supabase/`, `src/proxy.ts`, `src/app/*actions.ts`, `src/app/admin/`, `src/components/admin/`, 회원·주문·결제 화면(`src/app/(site)/login`, `signup`, `forgot-password`, `account`, `orders`, `checkout`, `src/components/member/`, `cart/`), `src/config/business.ts`
+- 최현민 (홈·안내): `src/app/(site)/page.tsx`, `src/components/home/`, `src/app/(site)/info/`, `terms/`, `privacy/`, `src/config/legal.ts`
 
 담당이 아닌 파일을 고쳐야 할 것 같으면 수정하지 말고, 어떤 파일의 무엇을 바꿔야 하는지 사용자에게 알려준다. 사용자가 담당자에게 요청한다.
 
@@ -66,7 +65,7 @@ public/                            이미지 (products/, home/, brand/ …)
 - 상품 정보(이름, 가격, 설명, 이미지 등)는 Supabase DB에 있다. 코드에 상품명·가격을 직접 적지 않는다.
 - 상품 추가·수정은 사이트의 `/admin` 관리자 페이지에서 한다. 화면에서는 `src/lib/products.ts`의 함수로 불러온다.
 - 가격은 숫자로 저장하고, 화면에 보여줄 때 `18,000원` 형식으로 바꾼다.
-- DB 구조를 바꿔야 하면 직접 하지 말고 팀장에게 요청한다.
+- DB 구조를 바꿔야 하면 직접 하지 말고 백엔드 담당(정태두)에게 요청한다.
 
 ## 이미지
 
