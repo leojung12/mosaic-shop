@@ -9,7 +9,7 @@
 - 꽃·오브제 소품(화병 등)을 파는 MOSAIC 편집숍 사이트 (운영 주소: https://mosaic-objects.vercel.app)
 - Next.js 16 + Tailwind CSS v4 + Supabase(DB·로그인) + 토스페이먼츠(결제)
 - 위 `AGENTS.md` 경고대로 이 Next.js는 버전이 새로워 예전 지식과 다를 수 있다. 코드를 쓰기 전 `node_modules/next/dist/docs/`의 관련 문서를 확인한다.
-- 새 npm 패키지 추가는 김민주 팀장 확인 후에만 한다.
+- 새 npm 패키지 추가는 백엔드 담당(정태두) 확인 후에만 한다.
 - 분위기: 미니멀, 여백 많이. 모바일 화면 우선
 
 ## 처음 실행
@@ -43,10 +43,10 @@ public/                            이미지 (products/, home/, brand/ …)
 
 같은 파일을 여러 명이 동시에 고치면 충돌이 난다. 자기 담당 파일만 수정한다.
 
-- 김민주 (팀장, 공통): 아래 담당에 없는 전부 — 공통 레이아웃(`src/app/layout.tsx`, `src/app/(site)/layout.tsx`), `globals.css`, 헤더·푸터 등 `src/components/` 바로 아래 공통 파일, `src/config/site.ts`·`categories.ts`, `package.json`
+- 김민주 (팀장, 홈): `src/app/(site)/page.tsx`, `src/components/home/`, `public/home/`
 - 김시현 (목록·상세): `src/app/(site)/shop/`, `search/`, `product/`, `src/components/shop/`, `product/`, `review/`
-- 정태두 (백엔드): `src/lib/`, `supabase/`, `src/proxy.ts`, `src/app/*actions.ts`, `src/app/admin/`, `src/components/admin/`, 회원·주문·결제 화면(`src/app/(site)/login`, `signup`, `forgot-password`, `account`, `orders`, `checkout`, `src/components/member/`, `cart/`), `src/config/business.ts`
-- 최현민 (홈·안내): `src/app/(site)/page.tsx`, `src/components/home/`, `src/app/(site)/info/`, `terms/`, `privacy/`, `src/config/legal.ts`
+- 정태두 (백엔드): `src/lib/`, `supabase/`, `src/proxy.ts`, `src/app/*actions.ts`, `src/app/admin/`, `src/components/admin/`, 회원·주문·결제 화면(`src/app/(site)/login`, `signup`, `forgot-password`, `account`, `orders`, `checkout`, `src/components/member/`, `cart/`), `src/config/business.ts`, `package.json`
+- 최현민 (공통·안내): 공통 레이아웃(`src/app/layout.tsx`, `src/app/(site)/layout.tsx`), `globals.css`, 헤더·푸터 등 `src/components/` 바로 아래 공통 파일, `src/config/site.ts`·`categories.ts`·`legal.ts`, `src/app/(site)/info/`, `terms/`, `privacy/`, 그리고 위 담당에 없는 나머지
 
 담당이 아닌 파일을 고쳐야 할 것 같으면 수정하지 말고, 어떤 파일의 무엇을 바꿔야 하는지 사용자에게 알려준다. 사용자가 담당자에게 요청한다.
 
