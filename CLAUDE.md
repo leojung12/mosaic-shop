@@ -43,10 +43,29 @@ public/                            이미지 (products/, home/, brand/ …)
 
 같은 파일을 여러 명이 동시에 고치면 충돌이 난다. 자기 담당 파일만 수정한다.
 
-- 김민주 (팀장, 홈): `src/app/(site)/page.tsx`, `src/components/home/`, `public/home/`
-- 김시현 (목록·상세): `src/app/(site)/shop/`, `search/`, `product/`, `src/components/shop/`, `product/`, `review/`
-- 정태두 (백엔드): `src/lib/`, `supabase/`, `src/proxy.ts`, `src/app/*actions.ts`, `src/app/admin/`, `src/components/admin/`, 회원·주문·결제 화면(`src/app/(site)/login`, `signup`, `forgot-password`, `account`, `orders`, `checkout`, `src/components/member/`, `cart/`), `src/config/business.ts`, `package.json`
-- 최현민 (공통·안내): 공통 레이아웃(`src/app/layout.tsx`, `src/app/(site)/layout.tsx`), `globals.css`, 헤더·푸터 등 `src/components/` 바로 아래 공통 파일, `src/config/site.ts`·`categories.ts`·`legal.ts`, `src/app/(site)/info/`, `terms/`, `privacy/`, 그리고 위 담당에 없는 나머지
+### 김민주 (팀장) — 홈
+- 화면: 사이트 첫 화면 `/` (전체 화면 슬라이드 사진, 가운데 로고, 카테고리 바로가기)
+- 하는 일: 첫인상 디자인. 슬라이드 사진·문구·순서, 카테고리 입구 배치, 모바일 첫 화면
+- 파일: `src/app/(site)/page.tsx`, `src/components/home/`, `public/home/`(슬라이드 사진)
+- 팀장 역할: 담당이 애매한 요청은 누가 할지 정해준다
+
+### 김시현 — 목록·상세 (손님이 상품을 고르는 화면)
+- 화면: 상품 목록 `/shop`, 카테고리별 목록 `/shop/vase` 등, 검색 `/search`, 상품 상세 `/product/상품주소`
+- 하는 일: 상품 격자(칸 배치·사진 크기·배지), Best·MD Pick 구역, 상세 페이지 레이아웃(큰 이름+누끼 첫 화면, 가격·설명·사이즈 접이식, 디테일 사진), 구매 후기 표시
+- 파일: `src/app/(site)/shop/`, `src/app/(site)/search/`, `src/app/(site)/product/`, `src/components/shop/`, `src/components/product/`, `src/components/review/`
+- 안 하는 것: 상품 데이터 자체(이름·가격·사진 등록)는 `/admin`에서 입력. 장바구니 담기·결제 동작은 정태두
+
+### 정태두 — 백엔드 (데이터·로그인·주문·결제)
+- 화면: 로그인·회원가입·비밀번호 찾기 `/login` `/signup` `/forgot-password`, 마이페이지 `/account`, 주문 조회 `/orders`, 주문서·결제 `/checkout`, 장바구니 서랍(헤더 BAG), 관리자 `/admin` 전체
+- 하는 일: Supabase DB 구조·데이터, 로그인, 장바구니·주문·토스 결제, 관리자 기능(상품·주문·문의·쿠폰 관리), 다른 담당이 필요한 데이터를 불러오는 함수 만들어주기
+- 파일: `src/lib/`, `supabase/`, `src/proxy.ts`, `src/app/` 바로 아래 `*actions.ts`, `src/app/admin/`, `src/components/admin/`, `src/components/member/`, `src/components/cart/`, 위 화면들의 `src/app/(site)/login`·`signup`·`forgot-password`·`account`·`orders`·`checkout/`, `src/config/business.ts`(배송비·사업자 정보), `package.json`
+- 비밀 키(`.env.local`, Vercel 환경변수)는 회장(정민규)과 함께 관리
+
+### 최현민 — 공통·안내 (모든 페이지에 걸리는 것 + 안내 페이지)
+- 화면: 모든 페이지의 헤더(로고·시계·메뉴)와 푸터, 페이지 전환 효과, 안내 `/info`, 이용약관 `/terms`, 개인정보처리방침 `/privacy`, 404 페이지
+- 하는 일: 사이트 전체 글꼴·색·여백(공통 스타일), 메뉴 구성, 사이트 이름·카테고리 목록 설정, 배송·교환·환불 안내와 약관 문구
+- 파일: `src/app/layout.tsx`, `src/app/(site)/layout.tsx`, `src/app/globals.css`, `src/app/fonts.ts`, `src/app/not-found.tsx`, `src/components/` 바로 아래 파일들(Header, Footer, Logo 등), `src/config/site.ts`·`categories.ts`·`legal.ts`, `src/app/(site)/info/`·`terms/`·`privacy/`, `public/brand/`
+- 위 네 사람 어디에도 없는 파일도 최현민 담당 (애매하면 김민주 팀장이 정함)
 
 담당이 아닌 파일을 고쳐야 할 것 같으면 수정하지 말고, 어떤 파일의 무엇을 바꿔야 하는지 사용자에게 알려준다. 사용자가 담당자에게 요청한다.
 
@@ -55,7 +74,7 @@ public/                            이미지 (products/, home/, brand/ …)
 ## Git 규칙
 
 - 작업 시작 전 항상 `git pull`로 최신 버전을 받는다.
-- 작업 단위마다 커밋한다. 커밋 메시지는 한국어로, 앞에 파트를 붙인다. 예: `[홈] 상품 그리드 모바일 2열로 변경`, `[상세] 주문 버튼 추가`, `[공통] 헤더 메뉴 정리`
+- 작업 단위마다 커밋한다. 커밋 메시지는 한국어로, 앞에 파트를 붙인다. 파트 이름은 `[홈]` `[목록·상세]` `[백엔드]` `[공통]` `[안내]` 중 하나. 예: `[홈] 슬라이드 사진 교체`, `[목록·상세] 상품 격자 모바일 2열로 변경`, `[백엔드] 쿠폰 만료일 추가`, `[공통] 헤더 메뉴 정리`
 - 푸시 전에 `npm run build`가 에러 없이 끝나는지 확인하고, 다시 `git pull` 후 푸시한다.
 - 충돌(conflict)이 나면 절대 임의로 덮어쓰거나 `--force` 하지 않는다. 어느 파일 어느 부분이 겹쳤는지 사용자에게 쉽게 설명하고, 어떻게 할지 물어본다.
 - main 브랜치에 직접 작업한다 (이번 프로젝트는 브랜치·PR 없이 파일 분담으로 진행).
