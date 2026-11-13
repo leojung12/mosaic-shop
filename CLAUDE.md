@@ -49,11 +49,17 @@ public/                            이미지 (products/, home/, brand/ …)
 - 파일: `src/app/(site)/page.tsx`, `src/components/home/`, `public/home/`, `public/brand/`, `src/app/layout.tsx`, `src/app/(site)/layout.tsx`, `src/app/globals.css`, `src/app/fonts.ts`, `src/components/` 바로 아래 파일들(Header, Footer, Logo 등), `src/config/site.ts`·`categories.ts`
 - 팀장 역할: 아래 담당 어디에도 없는 파일도 맡고, 담당이 애매한 요청은 누가 할지 정해준다
 
-### 김시현 — 목록·상세 (손님이 상품을 고르는 화면)
-- 화면: 상품 목록 `/shop`, 카테고리별 목록 `/shop/vase` 등, 검색 `/search`, 상품 상세 `/product/상품주소`
-- 하는 일: 상품 격자(칸 배치·사진 크기·배지), Best·MD Pick 구역, 상세 페이지 레이아웃(큰 이름+누끼 첫 화면, 가격·설명·사이즈 접이식, 디테일 사진), 구매 후기 표시
-- 파일: `src/app/(site)/shop/`, `src/app/(site)/search/`, `src/app/(site)/product/`, `src/components/shop/`, `src/components/product/`, `src/components/review/`
-- 안 하는 것: 상품 데이터 자체(이름·가격·사진 등록)는 `/admin`에서 입력. 장바구니 담기·결제 동작은 정태두
+### 김시현 — 목록 (손님이 상품을 둘러보는 화면)
+- 화면: 상품 목록 `/shop`, 카테고리별 목록 `/shop/vase` 등, 검색 `/search`
+- 하는 일: 상품 격자(칸 배치·사진 크기·번호·배지), Best·MD Pick·New Arrivals 구역, 카테고리 페이지, 검색 결과 화면
+- 파일: `src/app/(site)/shop/`, `src/app/(site)/search/`, `src/components/shop/`
+- 안 하는 것: 상품 데이터 자체(이름·가격·사진 등록)는 `/admin`에서 입력
+
+### 허은서 — 상세 (상품 하나를 보는 화면)
+- 화면: 상품 상세 `/product/상품주소`
+- 하는 일: 상세 페이지 레이아웃(큰 이름+누끼 첫 화면, 가격·큐레이터 노트, 사이즈·배송 접이식, 디테일 사진), 함께 보면 좋은 오브제, 구매 후기 표시, 상품 문의 폼 모양
+- 파일: `src/app/(site)/product/`, `src/components/product/`, `src/components/review/`
+- 안 하는 것: "담기·바로 구매" 버튼은 모양·위치만 담당하고, 눌렀을 때 장바구니에 들어가는 동작은 정태두
 
 ### 정태두 — 백엔드 (데이터·로그인·주문·결제)
 - 화면: 로그인·회원가입·비밀번호 찾기 `/login` `/signup` `/forgot-password`, 마이페이지 `/account`, 주문 조회 `/orders`, 주문서·결제 `/checkout`, 장바구니 서랍(헤더 BAG), 관리자 `/admin` 전체
@@ -74,7 +80,7 @@ public/                            이미지 (products/, home/, brand/ …)
 ## Git 규칙
 
 - 작업 시작 전 항상 `git pull`로 최신 버전을 받는다.
-- 작업 단위마다 커밋한다. 커밋 메시지는 한국어로, 앞에 파트를 붙인다. 파트 이름은 `[홈]` `[목록·상세]` `[백엔드]` `[공통]` `[안내]` 중 하나 (김민주는 작업에 따라 `[홈]` 또는 `[공통]`). 예: `[홈] 슬라이드 사진 교체`, `[목록·상세] 상품 격자 모바일 2열로 변경`, `[백엔드] 쿠폰 만료일 추가`, `[공통] 헤더 메뉴 정리`
+- 작업 단위마다 커밋한다. 커밋 메시지는 한국어로, 앞에 파트를 붙인다. 파트 이름은 `[홈]` `[목록]` `[상세]` `[백엔드]` `[공통]` `[안내]` 중 하나 (김민주는 작업에 따라 `[홈]` 또는 `[공통]`). 예: `[홈] 슬라이드 사진 교체`, `[목록] 상품 격자 모바일 2열로 변경`, `[백엔드] 쿠폰 만료일 추가`, `[공통] 헤더 메뉴 정리`
 - 푸시 전에 `npm run build`가 에러 없이 끝나는지 확인하고, 다시 `git pull` 후 푸시한다.
 - 충돌(conflict)이 나면 절대 임의로 덮어쓰거나 `--force` 하지 않는다. 어느 파일 어느 부분이 겹쳤는지 사용자에게 쉽게 설명하고, 어떻게 할지 물어본다.
 - main 브랜치에 직접 작업한다 (이번 프로젝트는 브랜치·PR 없이 파일 분담으로 진행).
