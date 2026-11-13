@@ -43,11 +43,11 @@ public/                            이미지 (products/, home/, brand/ …)
 
 같은 파일을 여러 명이 동시에 고치면 충돌이 난다. 자기 담당 파일만 수정한다.
 
-### 김민주 (팀장) — 홈
-- 화면: 사이트 첫 화면 `/` (전체 화면 슬라이드 사진, 가운데 로고, 카테고리 바로가기)
-- 하는 일: 첫인상 디자인. 슬라이드 사진·문구·순서, 카테고리 입구 배치, 모바일 첫 화면
-- 파일: `src/app/(site)/page.tsx`, `src/components/home/`, `public/home/`(슬라이드 사진)
-- 팀장 역할: 담당이 애매한 요청은 누가 할지 정해준다
+### 김민주 (팀장) — 홈·공통 (첫 화면 + 모든 페이지에 걸리는 것)
+- 화면: 사이트 첫 화면 `/` (전체 화면 슬라이드 사진, 가운데 로고, 카테고리 바로가기), 모든 페이지의 헤더(로고·시계·메뉴)와 푸터, 페이지 전환 효과
+- 하는 일: 첫인상 디자인(슬라이드 사진·문구·순서, 카테고리 입구 배치), 사이트 전체 글꼴·색·여백(공통 스타일), 메뉴 구성, 사이트 이름·카테고리 목록 설정
+- 파일: `src/app/(site)/page.tsx`, `src/components/home/`, `public/home/`, `public/brand/`, `src/app/layout.tsx`, `src/app/(site)/layout.tsx`, `src/app/globals.css`, `src/app/fonts.ts`, `src/components/` 바로 아래 파일들(Header, Footer, Logo 등), `src/config/site.ts`·`categories.ts`
+- 팀장 역할: 아래 담당 어디에도 없는 파일도 맡고, 담당이 애매한 요청은 누가 할지 정해준다
 
 ### 김시현 — 목록·상세 (손님이 상품을 고르는 화면)
 - 화면: 상품 목록 `/shop`, 카테고리별 목록 `/shop/vase` 등, 검색 `/search`, 상품 상세 `/product/상품주소`
@@ -61,11 +61,11 @@ public/                            이미지 (products/, home/, brand/ …)
 - 파일: `src/lib/`, `supabase/`, `src/proxy.ts`, `src/app/` 바로 아래 `*actions.ts`, `src/app/admin/`, `src/components/admin/`, `src/components/member/`, `src/components/cart/`, 위 화면들의 `src/app/(site)/login`·`signup`·`forgot-password`·`account`·`orders`·`checkout/`, `src/config/business.ts`(배송비·사업자 정보), `package.json`
 - 비밀 키(`.env.local`, Vercel 환경변수)는 회장(정민규)과 함께 관리
 
-### 최현민 — 공통·안내 (모든 페이지에 걸리는 것 + 안내 페이지)
-- 화면: 모든 페이지의 헤더(로고·시계·메뉴)와 푸터, 페이지 전환 효과, 안내 `/info`, 이용약관 `/terms`, 개인정보처리방침 `/privacy`, 404 페이지
-- 하는 일: 사이트 전체 글꼴·색·여백(공통 스타일), 메뉴 구성, 사이트 이름·카테고리 목록 설정, 배송·교환·환불 안내와 약관 문구
-- 파일: `src/app/layout.tsx`, `src/app/(site)/layout.tsx`, `src/app/globals.css`, `src/app/fonts.ts`, `src/app/not-found.tsx`, `src/components/` 바로 아래 파일들(Header, Footer, Logo 등), `src/config/site.ts`·`categories.ts`·`legal.ts`, `src/app/(site)/info/`·`terms/`·`privacy/`, `public/brand/`
-- 위 네 사람 어디에도 없는 파일도 최현민 담당 (애매하면 김민주 팀장이 정함)
+### 최현민 — 안내 (손님이 읽는 글 페이지)
+- 화면: 안내 `/info`(배송·교환·환불·문의처), 이용약관 `/terms`, 개인정보처리방침 `/privacy`, 없는 주소로 갔을 때 나오는 404 페이지
+- 하는 일: 안내·약관 페이지의 문구와 읽기 좋은 배치, 배송·교환·환불 정책 정리(기획팀 결정 반영), 404 페이지 디자인
+- 파일: `src/app/(site)/info/`, `src/app/(site)/terms/`, `src/app/(site)/privacy/`, `src/components/LegalPage.tsx`, `src/config/legal.ts`, `src/app/not-found.tsx`
+- 안 하는 것: 배송비 금액·사업자 정보 값(`src/config/business.ts`)은 정태두, 헤더·푸터는 김민주
 
 담당이 아닌 파일을 고쳐야 할 것 같으면 수정하지 말고, 어떤 파일의 무엇을 바꿔야 하는지 사용자에게 알려준다. 사용자가 담당자에게 요청한다.
 
@@ -74,7 +74,7 @@ public/                            이미지 (products/, home/, brand/ …)
 ## Git 규칙
 
 - 작업 시작 전 항상 `git pull`로 최신 버전을 받는다.
-- 작업 단위마다 커밋한다. 커밋 메시지는 한국어로, 앞에 파트를 붙인다. 파트 이름은 `[홈]` `[목록·상세]` `[백엔드]` `[공통]` `[안내]` 중 하나. 예: `[홈] 슬라이드 사진 교체`, `[목록·상세] 상품 격자 모바일 2열로 변경`, `[백엔드] 쿠폰 만료일 추가`, `[공통] 헤더 메뉴 정리`
+- 작업 단위마다 커밋한다. 커밋 메시지는 한국어로, 앞에 파트를 붙인다. 파트 이름은 `[홈]` `[목록·상세]` `[백엔드]` `[공통]` `[안내]` 중 하나 (김민주는 작업에 따라 `[홈]` 또는 `[공통]`). 예: `[홈] 슬라이드 사진 교체`, `[목록·상세] 상품 격자 모바일 2열로 변경`, `[백엔드] 쿠폰 만료일 추가`, `[공통] 헤더 메뉴 정리`
 - 푸시 전에 `npm run build`가 에러 없이 끝나는지 확인하고, 다시 `git pull` 후 푸시한다.
 - 충돌(conflict)이 나면 절대 임의로 덮어쓰거나 `--force` 하지 않는다. 어느 파일 어느 부분이 겹쳤는지 사용자에게 쉽게 설명하고, 어떻게 할지 물어본다.
 - main 브랜치에 직접 작업한다 (이번 프로젝트는 브랜치·PR 없이 파일 분담으로 진행).
