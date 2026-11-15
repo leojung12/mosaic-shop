@@ -10,7 +10,7 @@ import HomeLink from "@/components/HomeLink";
 import PageMotion from "@/components/PageMotion";
 import Reveal from "@/components/Reveal";
 import PageTint from "@/components/product/PageTint";
-import ProductReviews from "@/components/review/ProductReviews";
+import ProductReviews, { getReviews } from "@/components/review/ProductReviews";
 import ProductHero from "@/components/product/ProductHero";
 import { categoryOf } from "@/config/categories";
 import { BRAND_NAME, UI, formatPrice } from "@/config/site";
@@ -57,6 +57,9 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
   const cat = categoryOf(product.category);
   const { w, d, h } = product.size;
   const photo = product.images[0] ?? product.cutout;
+  // 후기 요약 — 가격 아래와 Reviews 제목에 개수·별점을 보여 준다
+  const reviews = await getReviews(product.id);
+  const reviewAvg = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0;
 
   return (
     // 1) 첫 화면: 거대한 이름 + 누끼 (숍 격자에서 날아옴)
@@ -67,7 +70,7 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
       <PageTint product={product} />
       <ProductHero product={product} no={index} total={all.length} />
 
-      <article className="px-5 pt-20 pb-10 md:pt-28">
+      <article className="px-5 pt-6 pb-10 md:pt-10">
         {/* 2) 가운데 한 단 */}
         <Reveal>
           <div className="mx-auto flex max-w-[440px] flex-col items-center text-center">
@@ -87,6 +90,12 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
             <p className="label mt-4 text-[13px] text-(--current-ink)">
               {product.soldOut ? "Sold out" : formatPrice(product.price)}
             </p>
+            {reviews.length > 0 && (
+              <a href="#reviews" className="label mt-3 text-muted hover:opacity-60">
+                <span className="tracking-[0.1em] text-(--current-ink)">★</span> {reviewAvg.toFixed(1)} · 후기{" "}
+                {reviews.length}개
+              </a>
+            )}
             <blockquote className="mt-8 text-[15px] leading-[1.85]">{product.curatorNote}</blockquote>
           </div>
         </Reveal>
@@ -138,10 +147,20 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
                   </tbody>
                 </table>
               </Disclosure>
-              <Disclosure title="Reviews">
-                <Suspense fallback={<p className="text-[13px] text-muted">Loading…</p>}>
-                  <ProductReviews productId={product.id} slug={product.slug} />
-                </Suspense>
+              <Disclosure
+                id="reviews"
+                title={
+                  reviews.length > 0 ? (
+                    <span>
+                      Reviews ({reviews.length})
+                      <span className="ml-2 text-muted">★ {reviewAvg.toFixed(1)}</span>
+                    </span>
+                  ) : (
+                    "Reviews"
+                  )
+                }
+              >
+                <ProductReviews productId={product.id} slug={product.slug} reviews={reviews} />
               </Disclosure>
               <Disclosure title="Q&A">
                 <InquiryForm productId={product.id} />
@@ -172,10 +191,7 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
 
         {/* 4) DETAIL — 큰 사진이 아래로 쭉 */}
         <section className="cv-auto mx-auto mt-28 max-w-[880px]">
-          <div className="label flex border-b border-current/20">
-            <span className="flex-1 border-b border-current pb-3 text-center">Detail</span>
-            <span className="flex-1 pb-3 text-center text-muted">No. {pad(index)}</span>
-          </div>
+          <p className="label border-b border-current pb-3 text-center">Detail</p>
 
           <div className="mt-14 flex flex-col items-center gap-14 md:gap-20">
             <DetailShot src={photo} alt={`${product.name} — ${product.color}`} />
@@ -227,9 +243,19 @@ function DetailShot({ src, alt, zoom = 1, focus = "50% 50%" }: { src: string; al
   );
 }
 
-function Disclosure({ title, open, children }: { title: string; open?: boolean; children: React.ReactNode }) {
+function Disclosure({
+  id,
+  title,
+  open,
+  children,
+}: {
+  id?: string;
+  title: React.ReactNode;
+  open?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <details open={open} className="group border-b border-current/20 text-left">
+    <details id={id} open={open} className="group scroll-mt-24 border-b border-current/20 text-left">
       <summary className="label flex cursor-pointer list-none items-center justify-between py-3.5 [&::-webkit-details-marker]:hidden">
         {title}
         <span aria-hidden className="transition-transform group-open:rotate-90">

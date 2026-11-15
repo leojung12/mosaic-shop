@@ -5,7 +5,6 @@ import Image from "next/image";
 import { ViewTransition, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import Sticker from "@/components/fx/Sticker";
 import { categoryOf } from "@/config/categories";
-import { formatPrice } from "@/config/site";
 import { EASE, objectName } from "@/lib/motion";
 import type { Product } from "@/types/product";
 
@@ -45,13 +44,9 @@ export default function ProductHero({ product: p, no, total }: { product: Produc
   // 실제 높이(cm)에 비례: 키 큰 화병은 크게, 낮은 볼·조약돌은 작게 (화면 높이 20~56%)
   const objH = Math.min(56, Math.max(20, p.size.h * 1.9));
   const pad = (n: number) => String(n).padStart(2, "0");
-  const scrollDown = () => {
-    const el = ref.current;
-    if (el) window.scrollTo({ top: el.offsetTop + el.offsetHeight - 72, behavior: reduce ? "auto" : "smooth" });
-  };
 
   return (
-    <section ref={ref} data-hero className="relative h-svh min-h-[600px] overflow-hidden">
+    <section ref={ref} data-hero className="relative h-[86svh] min-h-[560px] overflow-hidden">
       <motion.h1
         ref={nameRef}
         style={{ y: nameY, fontSize: fit < 1 ? `calc(${nameSize} * ${fit.toFixed(3)})` : nameSize }}
@@ -104,23 +99,13 @@ export default function ProductHero({ product: p, no, total }: { product: Produc
       </motion.div>
 
       <p className="label absolute top-20 left-5 md:top-24 md:left-8">
-        № {pad(no)} <span className="opacity-50">/ {pad(total)}</span>
+        No. {pad(no)} <span className="opacity-50">/ {pad(total)}</span>
       </p>
       <p className="label absolute top-20 right-5 text-right md:top-24 md:right-8">
         {categoryOf(p.category)?.label}
         <br />
         <span className="opacity-60">{p.color}</span>
       </p>
-      <div className="absolute bottom-6 left-5 md:bottom-8 md:left-8">
-        <p className="label">{p.soldOut ? "Sold out" : formatPrice(p.price)}</p>
-      </div>
-      <button
-        type="button"
-        onClick={scrollDown}
-        className="label hover-line absolute right-5 bottom-6 md:right-8 md:bottom-8"
-      >
-        Details ↓
-      </button>
     </section>
   );
 }

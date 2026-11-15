@@ -1,7 +1,7 @@
 import { publicClient } from "@/lib/supabase/public";
 import ReviewForm from "./ReviewForm";
 
-type Review = { id: string; author: string; rating: number; body: string; created_at: string };
+export type Review = { id: string; author: string; rating: number; body: string; created_at: string };
 
 // 상품 상세의 구매 후기 (요청 때마다 읽는다)
 export async function getReviews(productId: string) {
@@ -15,8 +15,17 @@ export async function getReviews(productId: string) {
   return (data ?? []) as Review[];
 }
 
-export default async function ProductReviews({ productId, slug }: { productId: string; slug: string }) {
-  const reviews = await getReviews(productId);
+export default async function ProductReviews({
+  productId,
+  slug,
+  reviews: given,
+}: {
+  productId: string;
+  slug: string;
+  // 페이지에서 이미 불러온 후기가 있으면 그대로 쓴다 (같은 요청을 두 번 하지 않도록)
+  reviews?: Review[];
+}) {
+  const reviews = given ?? (await getReviews(productId));
   const avg = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0;
   return (
     <div className="space-y-6">
