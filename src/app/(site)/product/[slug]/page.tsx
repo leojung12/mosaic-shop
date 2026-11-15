@@ -12,6 +12,7 @@ import Reveal from "@/components/Reveal";
 import PageTint from "@/components/product/PageTint";
 import ProductReviews, { getReviews } from "@/components/review/ProductReviews";
 import ProductHero from "@/components/product/ProductHero";
+import DetailTabs from "@/components/product/DetailTabs";
 import { categoryOf } from "@/config/categories";
 import { BRAND_NAME, UI, formatPrice } from "@/config/site";
 import { getProduct, getProducts } from "@/lib/products";
@@ -74,6 +75,10 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
         {/* 2) 가운데 한 단 */}
         <Reveal>
           <div className="mx-auto flex max-w-[440px] flex-col items-center text-center">
+            {/* NEW 같은 배지는 첫 화면 스티커 대신 번호 위에 — 검은 네모 + 흰 라벨 글씨 */}
+            {product.badge && (
+              <p className="label mb-3 bg-(--ink) px-2 py-1 leading-none text-white">{product.badge}</p>
+            )}
             <p className="label text-muted">
               No. {pad(index)}
               {cat && (
@@ -107,65 +112,14 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
               Ships in {product.leadDays.min}–{product.leadDays.max} business days
             </p>
 
-            <div className="mt-8 border-t border-current">
-              <Disclosure title="Size & Material" open>
-                <dl className="label grid grid-cols-[96px_1fr] gap-y-2 text-left normal-case">
-                  <dt className="text-muted uppercase">Size</dt>
-                  <dd>
-                    W {w} × D {d} × H {h} cm
-                  </dd>
-                  <dt className="text-muted uppercase">Weight</dt>
-                  <dd>{product.weightG.toLocaleString("ko-KR")} g</dd>
-                  <dt className="text-muted uppercase">Material</dt>
-                  <dd className="font-sans">{product.material}</dd>
-                </dl>
-              </Disclosure>
-              <Disclosure title="Shipping">
-                <p className="text-[13px] leading-relaxed">
-                  주문 후 영업일 기준 {product.leadDays.min}~{product.leadDays.max}일 안에 출고됩니다. 공급처에서 바로
-                  보내 드리며, 다른 상품과 함께 주문하면 따로 도착할 수 있어요.
-                </p>
-                <Link href="/info#shipping" className="label mt-3 inline-block hover:opacity-60">
-                  {UI.returnMore}
-                </Link>
-              </Disclosure>
-              <Disclosure title="Exchange / Return">
-                <p className="text-[13px] leading-relaxed">{UI.returnSummary}</p>
-                <Link href="/info#returns" className="label mt-3 inline-block hover:opacity-60">
-                  {UI.returnMore}
-                </Link>
-              </Disclosure>
-              <Disclosure title="Product Notice">
-                <table className="w-full text-left text-[13px]">
-                  <tbody>
-                    {Object.entries(product.notice).map(([k, v]) => (
-                      <tr key={k} className="border-b border-current/10 last:border-0">
-                        <th className="w-2/5 py-2 pr-3 align-top font-normal text-muted">{k}</th>
-                        <td className="py-2">{v}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Disclosure>
-              <Disclosure
-                id="reviews"
-                title={
-                  reviews.length > 0 ? (
-                    <span>
-                      Reviews ({reviews.length})
-                      <span className="ml-2 text-muted">★ {reviewAvg.toFixed(1)}</span>
-                    </span>
-                  ) : (
-                    "Reviews"
-                  )
-                }
-              >
-                <ProductReviews productId={product.id} slug={product.slug} reviews={reviews} />
-              </Disclosure>
-              <Disclosure title="Q&A">
-                <InquiryForm productId={product.id} />
-              </Disclosure>
-            </div>
+            {/* 구매 후기 — 위쪽에는 후기만 펼쳐서 보여 준다 (나머지 정보는 아래 Info 탭) */}
+            <section id="reviews" className="mt-8 scroll-mt-24 border-t border-current pt-4 text-left">
+              <h3 className="label mb-5">
+                Reviews{reviews.length > 0 && ` (${reviews.length})`}
+                {reviews.length > 0 && <span className="ml-2 text-muted">★ {reviewAvg.toFixed(1)}</span>}
+              </h3>
+              <ProductReviews productId={product.id} slug={product.slug} reviews={reviews} />
+            </section>
           </div>
         </Reveal>
 
@@ -191,28 +145,76 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
 
         {/* 4) DETAIL — 큰 사진이 아래로 쭉 */}
         <section className="cv-auto mx-auto mt-28 max-w-[880px]">
-          <p className="label border-b border-current pb-3 text-center">Detail</p>
-
-          <div className="mt-14 flex flex-col items-center gap-14 md:gap-20">
-            <DetailShot src={photo} alt={`${product.name} — ${product.color}`} />
-            <p className="max-w-[440px] text-center font-serif text-[22px] leading-[1.35] md:text-[28px]">
-              {product.name.toLowerCase().replace(/(^|\s)\S/g, (m) => m.toUpperCase())}, in {product.color.toLowerCase()}.
-            </p>
-            <DetailShot src={photo} alt="" zoom={1.8} focus="50% 30%" />
-            <div className="label max-w-[440px] text-center leading-[2] text-muted">
-              {product.material}
-              <br />W {w} × D {d} × H {h} cm · {product.weightG.toLocaleString("ko-KR")} g
-            </div>
-            <DetailShot src={photo} alt="" zoom={2.6} focus="55% 60%" />
-            <div className="relative aspect-square w-full max-w-[560px] bg-(--tile)">
-              <span className="absolute inset-[14%] flex items-end justify-center">
-                <ObjectFrame product={product} sizes="(min-width: 768px) 420px, 70vw" />
-              </span>
-            </div>
-            <p className="label text-center text-muted">
-              {BRAND_NAME} — objects chosen slowly, kept for a long time.
-            </p>
-          </div>
+          <DetailTabs
+            detail={
+              <div className="mt-14 flex flex-col items-center gap-14 md:gap-20">
+                <DetailShot src={photo} alt={`${product.name} — ${product.color}`} />
+                <p className="max-w-[440px] text-center font-serif text-[22px] leading-[1.35] md:text-[28px]">
+                  {product.name.toLowerCase().replace(/(^|\s)\S/g, (m) => m.toUpperCase())}, in {product.color.toLowerCase()}.
+                </p>
+                <DetailShot src={photo} alt="" zoom={1.8} focus="50% 30%" />
+                <div className="label max-w-[440px] text-center leading-[2] text-muted">
+                  {product.material}
+                  <br />W {w} × D {d} × H {h} cm · {product.weightG.toLocaleString("ko-KR")} g
+                </div>
+                <DetailShot src={photo} alt="" zoom={2.6} focus="55% 60%" />
+                <div className="relative aspect-square w-full max-w-[560px] bg-(--tile)">
+                  <span className="absolute inset-[14%] flex items-end justify-center">
+                    <ObjectFrame product={product} sizes="(min-width: 768px) 420px, 70vw" />
+                  </span>
+                </div>
+                <p className="label text-center text-muted">
+                  {BRAND_NAME} — objects chosen slowly, kept for a long time.
+                </p>
+              </div>
+            }
+            info={
+              <div className="mx-auto mt-14 max-w-[440px] space-y-12 text-left">
+                <InfoBlock title="Size & Material">
+                  <dl className="label grid grid-cols-[96px_1fr] gap-y-2 normal-case">
+                    <dt className="text-muted uppercase">Size</dt>
+                    <dd>
+                      W {w} × D {d} × H {h} cm
+                    </dd>
+                    <dt className="text-muted uppercase">Weight</dt>
+                    <dd>{product.weightG.toLocaleString("ko-KR")} g</dd>
+                    <dt className="text-muted uppercase">Material</dt>
+                    <dd className="font-sans">{product.material}</dd>
+                  </dl>
+                </InfoBlock>
+                <InfoBlock title="Shipping">
+                  <p className="text-[13px] leading-relaxed">
+                    주문 후 영업일 기준 {product.leadDays.min}~{product.leadDays.max}일 안에 출고됩니다. 공급처에서 바로
+                    보내 드리며, 다른 상품과 함께 주문하면 따로 도착할 수 있어요.
+                  </p>
+                  <Link href="/info#shipping" className="label mt-3 inline-block hover:opacity-60">
+                    {UI.returnMore}
+                  </Link>
+                </InfoBlock>
+                <InfoBlock title="Exchange / Return">
+                  <p className="text-[13px] leading-relaxed">{UI.returnSummary}</p>
+                  <Link href="/info#returns" className="label mt-3 inline-block hover:opacity-60">
+                    {UI.returnMore}
+                  </Link>
+                </InfoBlock>
+                <InfoBlock title="Product Notice">
+                  <table className="w-full text-left text-[13px]">
+                    <tbody>
+                      {Object.entries(product.notice).map(([k, v]) => (
+                        <tr key={k} className="border-b border-current/10 last:border-0">
+                          <th className="w-2/5 py-2 pr-3 align-top font-normal text-muted">{k}</th>
+                          <td className="py-2">{v}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </InfoBlock>
+                <InfoBlock title="Q&A">
+                  <InquiryForm productId={product.id} />
+                </InfoBlock>
+              </div>
+            }
+          />
         </section>
 
         <div className="mt-20 flex justify-center">
@@ -243,26 +245,12 @@ function DetailShot({ src, alt, zoom = 1, focus = "50% 50%" }: { src: string; al
   );
 }
 
-function Disclosure({
-  id,
-  title,
-  open,
-  children,
-}: {
-  id?: string;
-  title: React.ReactNode;
-  open?: boolean;
-  children: React.ReactNode;
-}) {
+// Info 탭 안의 한 묶음: 제목 + 그 아래 내용 (접지 않고 펼친 채로)
+function InfoBlock({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <details id={id} open={open} className="group scroll-mt-24 border-b border-current/20 text-left">
-      <summary className="label flex cursor-pointer list-none items-center justify-between py-3.5 [&::-webkit-details-marker]:hidden">
-        {title}
-        <span aria-hidden className="transition-transform group-open:rotate-90">
-          ›
-        </span>
-      </summary>
-      <div className="pb-5">{children}</div>
-    </details>
+    <section>
+      <h3 className="label mb-4 border-b border-current/20 pb-2">{title}</h3>
+      {children}
+    </section>
   );
 }

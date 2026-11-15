@@ -3,7 +3,6 @@
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { ViewTransition, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import Sticker from "@/components/fx/Sticker";
 import { categoryOf } from "@/config/categories";
 import { EASE, objectName } from "@/lib/motion";
 import type { Product } from "@/types/product";
@@ -94,7 +93,6 @@ export default function ProductHero({ product: p, no, total }: { product: Produc
               />
             </div>
           </ViewTransition>
-          {p.badge && <Sticker text={p.badge} active={false} large />}
         </div>
       </motion.div>
 
@@ -109,3 +107,4 @@ export default function ProductHero({ product: p, no, total }: { product: Produc
     </section>
   );
 }
+
