@@ -61,10 +61,12 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
   const cat = categoryOf(product.category);
   const { w, d, h } = product.size;
   const photo = product.images[0] ?? product.cutout;
-  // Detail 탭 마지막 사진 뒤에 넣는 작은 이름 — 첫 화면(ProductHero)과 같은 계산을 화면 대신 칸 크기(cqw·cqh) 기준으로
+  // Detail 탭 마지막 사진 뒤에 넣는 작은 이름 — 첫 화면(ProductHero)과 같은 계산을 화면 대신 칸 폭(cqw) 기준으로.
+  // 칸이 정사각형이라 높이 제한도 폭(cqw)으로 계산한다 (cqh 는 폭 기준 컨테이너에서 화면 높이로 잘못 잡혀 모바일에서 글씨가 넘쳤음)
+  // 옛 활자는 글자 폭이 들쭉날쭉해 여유를 두고 칸 폭의 약 80%로 맞춘다
   const nameWords = product.name.split(" ");
   const longestWord = Math.max(...nameWords.map((w) => w.length));
-  const miniNameSize = `min(${(88 / (longestWord * 0.72)).toFixed(1)}cqw, ${(62 / nameWords.length).toFixed(1)}cqh)`;
+  const miniNameSize = `min(${(80 / (longestWord * 0.72)).toFixed(1)}cqw, ${(62 / nameWords.length).toFixed(1)}cqw)`;
   // 후기 요약 — 가격 아래와 Reviews 제목에 개수·별점을 보여 준다
   const reviews = await getReviews(product.id);
   const reviewAvg = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0;
