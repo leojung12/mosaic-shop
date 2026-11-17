@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
-import { ViewTransition, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { ViewTransition, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { categoryOf } from "@/config/categories";
 import { EASE, objectName } from "@/lib/motion";
 import type { Product } from "@/types/product";
@@ -27,7 +27,7 @@ export default function ProductHero({ product: p, no, total }: { product: Produc
     const el = nameRef.current;
     if (!el) return;
     const measure = () => {
-      const spans = [...el.querySelectorAll("span")];
+      const spans = [...el.querySelectorAll<HTMLElement>("[data-word]")];
       const widest = Math.max(...spans.map((s) => s.scrollWidth / fit));
       const room = window.innerWidth * 0.92;
       setFit(widest > room ? room / widest : 1);
@@ -43,11 +43,14 @@ export default function ProductHero({ product: p, no, total }: { product: Produc
   // 실제 높이(cm)에 비례: 키 큰 화병은 크게, 낮은 볼·조약돌은 작게 (화면 높이 20~56%)
   const objH = Math.min(56, Math.max(20, p.size.h * 1.9));
   const pad = (n: number) => String(n).padStart(2, "0");
+  // 이름이 타자 치듯 — 왼쪽부터 한 글자씩 또박또박 나타난다
+  const typing = useTyping(p.name, !!reduce);
 
   return (
     <section ref={ref} data-hero className="relative h-[86svh] min-h-[560px] overflow-hidden">
       <motion.h1
         ref={nameRef}
+        aria-label={p.name}
         style={{ y: nameY, fontSize: fit < 1 ? `calc(${nameSize} * ${fit.toFixed(3)})` : nameSize }}
         className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center font-serif leading-[0.84] tracking-[-0.02em] uppercase will-change-transform select-none"
       >
@@ -58,9 +61,19 @@ export default function ProductHero({ product: p, no, total }: { product: Produc
             initial={{ opacity: 0, y: "30%" }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 + i * 0.08, duration: 1.1, ease: EASE }}
-            className={i % 2 ? "italic" : ""}
+            className={`relative ${i % 2 ? "italic" : ""}`}
+            data-word
+            aria-hidden
           >
-            {w}
+            {typing ? (
+              <>
+                {/* 자리(폭)는 진짜 글자로 잡아 두고, 그 위에 바뀌는 글자를 겹쳐 그린다 → 글씨가 흔들려도 배치가 안 움직임 */}
+                <span className="invisible">{w}</span>
+                <span className="absolute inset-0 text-left">{typing[i]}</span>
+              </>
+            ) : (
+              w
+            )}
           </motion.span>
         ))}
       </motion.h1>
@@ -108,3 +121,42 @@ export default function ProductHero({ product: p, no, total }: { product: Produc
   );
 }
 
+
+// 타자 모션. 글자가 왼쪽부터 한 글자씩 차례로 나타난다 (아직 안 온 글자는 비어 있음).
+// 끝나면 null 을 돌려줘 원래 글씨를 그대로 보여 준다. 움직임 줄이기 설정이면 처음부터 null.
+const TYPE_START = 150; // 이름이 올라오기 시작하는 시점에 맞춤 (ms)
+const TYPE_STEP = 100; // 글자 하나가 쳐지는 간격
+
+function useTyping(name: string, skip: boolean) {
+  const [out, setOut] = useState<string[] | null>(null);
+  useEffect(() => {
+    if (skip) return;
+    const words = name.split(" ");
+    const count = words.join("").length;
+    const end = TYPE_START + count * TYPE_STEP;
+    const t0 = performance.now();
+    let shown = -1;
+    let raf = 0;
+    const frame = (now: number) => {
+      const t = now - t0;
+      if (t >= end) {
+        setOut(null);
+        return;
+      }
+      // 지금까지 쳐진 글자 수가 바뀔 때만 다시 그린다
+      const typed = Math.max(0, Math.floor((t - TYPE_START) / TYPE_STEP) + (t >= TYPE_START ? 1 : 0));
+      if (typed !== shown) {
+        shown = typed;
+        let k = 0;
+        setOut(words.map((w) => [...w].filter(() => k++ < typed).join("")));
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(raf);
+      setOut(null);
+    };
+  }, [name, skip]);
+  return out;
+}

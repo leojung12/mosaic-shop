@@ -12,6 +12,7 @@ import Reveal from "@/components/Reveal";
 import PageTint from "@/components/product/PageTint";
 import ProductReviews, { getReviews } from "@/components/review/ProductReviews";
 import ProductHero from "@/components/product/ProductHero";
+import RelatedCarousel from "@/components/product/RelatedCarousel";
 import DetailTabs from "@/components/product/DetailTabs";
 import { categoryOf } from "@/config/categories";
 import { BRAND_NAME, UI, formatPrice } from "@/config/site";
@@ -47,17 +48,23 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
   const product = await getProduct(slug);
   if (!product) notFound();
   const all = await getProducts();
-  // 같은 카테고리를 먼저, 모자라면 다른 상품으로 채운다
+  // 함께 보면 좋은 오브제: 같은 카테고리 물건을 모두 넘겨 가며 보여 준다.
+  // 같은 카테고리가 3개보다 적으면 다른 상품으로 3칸을 채운다 (이때는 넘기지 않음)
   const rest = all.filter((p) => p.slug !== slug);
-  const related = [
-    ...rest.filter((p) => p.category === product.category),
-    ...rest.filter((p) => p.category !== product.category),
-  ].slice(0, 3);
+  const sameCategory = rest.filter((p) => p.category === product.category);
+  const related =
+    sameCategory.length >= 3
+      ? sameCategory
+      : [...sameCategory, ...rest.filter((p) => p.category !== product.category)].slice(0, 3);
   const index = all.findIndex((p) => p.slug === slug) + 1;
   const pad = (n: number, k = 3) => String(n).padStart(k, "0");
   const cat = categoryOf(product.category);
   const { w, d, h } = product.size;
   const photo = product.images[0] ?? product.cutout;
+  // Detail 탭 마지막 사진 뒤에 넣는 작은 이름 — 첫 화면(ProductHero)과 같은 계산을 화면 대신 칸 크기(cqw·cqh) 기준으로
+  const nameWords = product.name.split(" ");
+  const longestWord = Math.max(...nameWords.map((w) => w.length));
+  const miniNameSize = `min(${(88 / (longestWord * 0.72)).toFixed(1)}cqw, ${(62 / nameWords.length).toFixed(1)}cqh)`;
   // 후기 요약 — 가격 아래와 Reviews 제목에 개수·별점을 보여 준다
   const reviews = await getReviews(product.id);
   const reviewAvg = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0;
@@ -126,21 +133,7 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
         {/* 3) 함께 보면 좋은 오브제 */}
         <section className="cv-auto mx-auto mt-28 max-w-[880px]">
           <p className="label mb-6 text-center text-muted">{UI.otherObjects}</p>
-          <ul className="grid grid-cols-3 gap-3 md:gap-6">
-            {related.map((p) => (
-              <li key={p.slug}>
-                <Link href={`/product/${p.slug}`} prefetch={true} className="group block text-center">
-                  <span className="relative block aspect-square bg-(--tile) transition-colors duration-500 group-hover:bg-(--tile-hover)">
-                    <span className="absolute inset-[16%] flex items-end justify-center">
-                      <ObjectFrame product={p} sizes="(min-width: 768px) 280px, 30vw" />
-                    </span>
-                  </span>
-                  <span className="mt-3 block font-serif text-[14px] leading-tight md:text-[18px]">{p.name}</span>
-                  <span className="label mt-1 block text-muted">{formatPrice(p.price)}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <RelatedCarousel products={related} />
         </section>
 
         {/* 4) DETAIL — 큰 사진이 아래로 쭉 */}
@@ -158,9 +151,21 @@ async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) 
                   <br />W {w} × D {d} × H {h} cm · {product.weightG.toLocaleString("ko-KR")} g
                 </div>
                 <DetailShot src={photo} alt="" zoom={2.6} focus="55% 60%" />
-                <div className="relative aspect-square w-full max-w-[560px] bg-(--tile)">
+                <div className="@container relative aspect-square w-full max-w-[560px] overflow-hidden bg-(--tile)">
+                  {/* 맨 위 첫 화면의 축소판 — 뒤에 큰 이름, 그 위에 오브제 (글씨 크기는 이 칸 크기에 맞춰 같은 비율로) */}
+                  <p
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center font-serif leading-[0.84] tracking-[-0.02em] uppercase select-none"
+                    style={{ fontSize: miniNameSize }}
+                  >
+                    {nameWords.map((word, i) => (
+                      <span key={i} className={`whitespace-nowrap ${i % 2 ? "italic" : ""}`}>
+                        {word}
+                      </span>
+                    ))}
+                  </p>
                   <span className="absolute inset-[14%] flex items-end justify-center">
-                    <ObjectFrame product={product} sizes="(min-width: 768px) 420px, 70vw" />
+                    <ObjectFrame product={product} sizes="(min-width: 768px) 420px, 70vw" morph={false} />
                   </span>
                 </div>
                 <p className="label text-center text-muted">
