@@ -1,0 +1,74 @@
+name: Daily security check
+
+on:
+  schedule:
+    - cron: '17 0 * * *' # 09:17 KST
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: daily-security-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      row: ${{ steps.collect.outputs.row }}
+      status: ${{ steps.collect.outputs.status }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Run defensive checks
+        id: collect
+        run: python3 .github/scripts/daily_security_check.py collect
+
+  archive:
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Update the date in the reports branch
+        env:
+          SECURITY_CHECK_ROW: ${{ needs.check.outputs.row }}
+        run: |
+          report_ref=refs/heads/security-reports
+          archive="$(mktemp -d)"
+          vercel_config='{"git":{"deploymentEnabled":false}}'
+          if git ls-remote --exit-code --heads origin "$report_ref" > /dev/null; then
+            git fetch --no-tags --depth=1 origin "$report_ref"
+            if [ "$(git ls-tree --name-only FETCH_HEAD)" != "$(printf 'daily-security-check.csv\nvercel.json')" ] ||
+               [ "$(git show FETCH_HEAD:vercel.json)" != "$vercel_config" ]; then
+              echo 'The security-reports branch does not match the expected archive layout.'
+              exit 1
+            fi
+            git worktree add --detach "$archive" FETCH_HEAD
+          else
+            if [ "$?" -ne 2 ]; then
+              echo 'Unable to check the remote reports branch.'
+              exit 1
+            fi
+            git worktree add --detach "$archive" HEAD
+            git -C "$archive" switch --orphan security-reports-bootstrap
+            printf '%s\n' "$vercel_config" > "$archive/vercel.json"
+          fi
+          python3 .github/scripts/daily_security_check.py archive "$archive/daily-security-check.csv"
+          git -C "$archive" add -- daily-security-check.csv vercel.json
+          if ! git -C "$archive" diff --cached --quiet; then
+            git -C "$archive" -c user.name=github-actions[bot] \
+              -c user.email=41898282+github-actions[bot]@users.noreply.github.com \
+              commit -m '[skip ci] Update daily security report'
+            git push origin "$(git -C "$archive" rev-parse HEAD):$report_ref"
+          fi
+      - name: Flag a check that could not be completed
+        if: needs.check.outputs.status == 'ERROR'
+        run: exit 1
