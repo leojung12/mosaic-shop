@@ -20,9 +20,18 @@ export default function ShopView({
   const catalog = products.map((p) => p.slug);
 
   if (cat) {
+    const items = products.filter((p) => p.category === cat.slug);
     return (
-      <Shell title={cat.label}>
-        <ShopGrid key={cat.slug} products={products.filter((p) => p.category === cat.slug)} catalog={catalog} />
+      <Shell>
+        {/* 카테고리 제목: 영문 이름 · 한글 이름 · 상품 수 */}
+        <header className="mb-8 flex items-end justify-between gap-4 border-b border-current pb-4 md:mb-12">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h1 className="font-serif text-[32px] leading-none md:text-[48px]">{cat.label}</h1>
+            <span className="label text-muted">{cat.ko}</span>
+          </div>
+          <span className="label text-muted tabular-nums">{String(items.length).padStart(2, "0")} objects</span>
+        </header>
+        <ShopGrid key={cat.slug} products={items} catalog={catalog} />
       </Shell>
     );
   }
@@ -56,7 +65,8 @@ export default function ShopView({
       <div className="border-t border-current">
         {sections.map((s, i) => (
           // 첫 구역 아래는 화면에 들어올 때 그린다
-          <details key={s.key} open className={`group border-b border-current/20 ${i > 0 ? "cv-auto" : ""}`}>
+          // 처음엔 첫 구역(Best)만 펼쳐 두고 나머지는 접어 둔다
+          <details key={s.key} open={i === 0} className={`group border-b border-current/20 ${i > 0 ? "cv-auto" : ""}`}>
             <summary className="label flex cursor-pointer list-none items-center justify-between py-4 [&::-webkit-details-marker]:hidden">
               <span className="text-(--current-ink)">{s.title}</span>
               <span className="flex items-center gap-4 text-muted">
@@ -78,11 +88,12 @@ export default function ShopView({
   );
 }
 
-function Shell({ title, children }: { title: string; children: ReactNode }) {
+// title을 주면 화면 읽기용 h1을 넣는다 (화면에 보이는 h1을 직접 그리는 페이지는 생략)
+function Shell({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <PageMotion>
       <section className="mx-auto max-w-[972px] px-5 pt-24 pb-24 md:px-6 md:pt-28">
-        <h1 className="sr-only">{title}</h1>
+        {title && <h1 className="sr-only">{title}</h1>}
         {children}
       </section>
     </PageMotion>

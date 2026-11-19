@@ -30,6 +30,9 @@ export default function ShopGrid({
     const el = homeMemory.slug ? items.current.get(homeMemory.slug) : undefined;
     if (!el) return;
     rememberHome({ slug: null });
+    // 접혀 있는 구역 안의 상품이면 그 구역을 펼친 뒤 위치를 잰다
+    const section = el.closest("details");
+    if (section && !section.open) section.open = true;
     const r = el.getBoundingClientRect();
     restoreY.current = Math.max(0, window.scrollY + r.top - (window.innerHeight - r.height) / 2);
     window.scrollTo(0, restoreY.current);
@@ -42,7 +45,8 @@ export default function ShopGrid({
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-6 md:gap-y-12">
+      {/* 모바일 2칸, 태블릿·PC 3칸 */}
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-x-6 md:gap-y-12">
         {list.map((p, i) => (
           <li
             key={p.slug}
@@ -112,7 +116,7 @@ function Card({
           >
             <ObjectFrame
               product={p}
-              sizes="(min-width: 1000px) 450px, 46vw"
+              sizes="(min-width: 1000px) 300px, (min-width: 768px) 31vw, 46vw"
               preload={eager}
               morph={morph}
             />
