@@ -52,14 +52,14 @@ export default function Footer({ compact = false }: { compact?: boolean }) {
 
   if (compact) {
     return (
-      <footer className="px-5 pt-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
-        {line}
-      </footer>
+     <footer className="relative z-10 bg-[#EAF1F8] px-5 py-6 text-center text-[#24354A] md:text-left">
+         {line}
+     </footer>
     );
   }
 
   return (
-    <footer className="site-footer mt-24 border-t border-current/15 pt-12 pb-[calc(24px+env(safe-area-inset-bottom))] md:mt-32 md:pt-16">
+   <footer className="site-footer mt-24 border-t border-[#D95083]/20 bg-[#EAF1F8] pt-12 pb-[calc(24px+env(safe-area-inset-bottom))] text-[#24354A] md:mt-32 md:pt-16">
       <div className="px-5 md:px-8">
         <div className="grid grid-cols-3 gap-y-10 md:grid-cols-[2fr_1fr_1fr_1fr]">
           <div className="col-span-3 md:col-span-1">

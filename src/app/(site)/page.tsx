@@ -13,21 +13,24 @@ import { BRAND_NAME } from "@/config/site";
 // 이 화면에서만 헤더·footer 글자가 흰색 (HomeTheme 가 <html data-home> 을 켠다 → globals.css)
 export default function HomePage() {
   return (
-    <div className="relative flex h-svh min-h-[560px] flex-col overflow-hidden text-white">
-      <HomeTheme />
-      <HeroSlides />
+    
+  <div className="relative flex min-h-svh flex-col bg-[#a9c3e2] text-white">
+      
+<HomeTheme />
+<HeroSlides />
+
+{/* 모바일 전용 MOSAIC 로고 */}
+<div className="pointer-events-none absolute inset-x-0 top-[35%] z-20 flex justify-center px-4 md:hidden">
+  <h1 className="text-center font-serif text-[clamp(48px,15vw,90px)] font-bold leading-none tracking-[-0.07em] text-[#E9A2BB]">
+    MOSAIC
+  </h1>
+</div>
+
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-8 px-5 pt-16">
-        <h1 className="w-[min(72vw,440px)]">
-          {/* 다른 화면으로 가면 이 로고가 왼쪽 위 작은 로고 자리로 날아간다 (HeaderBrand 와 같은 전환 이름) */}
-          <ViewTransition name={BRAND_VT} share="morph" default="none">
-            <ClubWordmark className="block w-full" />
-          </ViewTransition>
-        </h1>
-        <p className="label max-w-[440px] text-center leading-[1.8] text-white/85">
-          {BRAND_NAME}, a small curated store in Seoul.
-          <br />
-          Objects gathered one piece at a time, each one chosen slowly.
-        </p>
+        
+        
+
+
       </div>
       <nav aria-label="Categories" className="relative z-10 px-5 pb-4 md:pb-6">
         <ul className="label flex flex-wrap items-baseline justify-center gap-x-5 gap-y-1.5 md:gap-x-7">
