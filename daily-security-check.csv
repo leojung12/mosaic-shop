@@ -1,4 +1,5 @@
 ﻿date_kst,checked_at_kst,overall,https_home,hsts,nosniff,tracked_sensitive_files,public_secret_variables,npm_high_critical,commit,actions_run
+2026-11-23,2026-11-23T16:51:30+09:00,REVIEW,PASS,PASS,REVIEW,PASS,PASS,PASS,9fe558f21fec22c6c83054904c826a9743cd633c,https://github.com/leojung12/mosaic-shop/actions/runs/45134126583
 2026-11-22,2026-11-22T16:03:43+09:00,REVIEW,PASS,PASS,REVIEW,PASS,PASS,PASS,b0a5cde6ada99a9f99b42bb80a7216f01b0cecbf,https://github.com/leojung12/mosaic-shop/actions/runs/44996472356
 2026-11-21,2026-11-21T16:23:29+09:00,REVIEW,PASS,PASS,REVIEW,PASS,PASS,PASS,b0a5cde6ada99a9f99b42bb80a7216f01b0cecbf,https://github.com/leojung12/mosaic-shop/actions/runs/44880011625
 2026-11-20,2026-11-20T16:28:36+09:00,REVIEW,PASS,PASS,REVIEW,PASS,PASS,PASS,9e4d303626622ff71aca479160f49f63380af6de,https://github.com/leojung12/mosaic-shop/actions/runs/44695217621
