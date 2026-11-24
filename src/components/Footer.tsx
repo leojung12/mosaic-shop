@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { BUSINESS, isTBD } from "@/config/business";
 import { CATEGORIES } from "@/config/categories";
@@ -7,7 +8,13 @@ import { BRAND_NAME, UI } from "@/config/site";
 const COLUMNS = [
   {
     title: "Shop",
-    links: [{ href: "/shop", label: "All objects" }, ...CATEGORIES.map((c) => ({ href: `/shop/${c.slug}`, label: c.label }))],
+    links: [
+      { href: "/shop", label: "All objects" },
+      ...CATEGORIES.map((c) => ({
+        href: `/shop/${c.slug}`,
+        label: c.label,
+      })),
+    ],
   },
   {
     title: "Help",
@@ -27,24 +34,26 @@ const COLUMNS = [
   },
 ];
 
-// 링크 + 명세 §5의 사업자 정보 한 줄.
-// compact: 모바일 홈 마지막 장처럼 자리가 좁은 곳에서는 한 줄만.
-export default function Footer({ compact = false }: { compact?: boolean }) {
+export default function Footer({
+  compact = false,
+}: {
+  compact?: boolean;
+}) {
   const items = [
-    isTBD(BUSINESS.companyName) ? `© ${BRAND_NAME}` : BUSINESS.companyName,
+    isTBD(BUSINESS.companyName)
+      ? `© ${BRAND_NAME}`
+      : BUSINESS.companyName,
     `CEO ${BUSINESS.ceo}`,
     `Business Reg. No. ${BUSINESS.bizNumber}`,
     `Mail-order Reg. No. ${BUSINESS.mailOrderNumber}`,
   ];
+
   const line = (
-    <div className="label flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[10px] text-muted md:justify-start">
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[10px] leading-relaxed opacity-70 md:justify-start">
       {items.map((t) => (
-        <span key={t} className="flex items-center gap-2">
-          {t}
-          <span aria-hidden>·</span>
-        </span>
+        <span key={t}>{t}</span>
       ))}
-      <Link href="/info" className="label hover:opacity-60">
+      <Link href="/info" className="hover:opacity-50">
         {UI.info}
       </Link>
     </div>
@@ -52,29 +61,44 @@ export default function Footer({ compact = false }: { compact?: boolean }) {
 
   if (compact) {
     return (
-     <footer className="relative z-10 bg-[#EAF1F8] px-5 py-6 text-center text-[#24354A] md:text-left">
-         {line}
-     </footer>
+      <footer className="relative z-10 bg-[#A9C3E2] px-5 py-6 text-[#24354A]">
+        {line}
+      </footer>
     );
   }
 
   return (
-   <footer className="site-footer mt-24 border-t border-[#D95083]/20 bg-[#EAF1F8] pt-12 pb-[calc(24px+env(safe-area-inset-bottom))] text-[#24354A] md:mt-32 md:pt-16">
-      <div className="px-5 md:px-8">
-        <div className="grid grid-cols-3 gap-y-10 md:grid-cols-[2fr_1fr_1fr_1fr]">
-          <div className="col-span-3 md:col-span-1">
-            <Seal className="size-[104px]" />
-            <p className="mt-3 max-w-[260px] text-[13px] leading-relaxed">
-              Objects chosen slowly, kept for a long time. A small curated store in Seoul.
+    <footer className="site-footer mt-24 overflow-hidden border-t border-[#24354A]/10 bg-[#A9C3E2] text-[#24354A] md:mt-32">
+      <div className="mx-auto max-w-[1600px] px-6 pt-12 md:px-12 md:pt-16">
+
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-[2fr_1fr_1fr_1fr]">
+
+          <div className="col-span-2 md:col-span-1">
+            <Seal className="size-[80px]" />
+
+            <p className="mt-5 text-[10px] uppercase tracking-[0.25em]">
+              A floral object shop
+            </p>
+
+            <p className="mt-4 max-w-[280px] text-[14px] leading-relaxed">
+              Objects chosen slowly, kept for a long time.
+              A small curated store in Seoul.
             </p>
           </div>
+
           {COLUMNS.map((c) => (
             <div key={c.title}>
-              <p className="label text-muted">{c.title}</p>
-              <ul className="mt-3 space-y-1.5 text-[13px]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.2em]">
+                {c.title}
+              </p>
+
+              <ul className="mt-5 space-y-3 text-[13px]">
                 {c.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="hover-line">
+                    <Link
+                      href={l.href}
+                      className="transition-opacity duration-300 hover:opacity-50"
+                    >
                       {l.label}
                     </Link>
                   </li>
@@ -84,10 +108,26 @@ export default function Footer({ compact = false }: { compact?: boolean }) {
           ))}
         </div>
 
-        <div className="mt-20 flex border-t border-current/20 pt-6 md:mt-28 flex-col items-center gap-3 md:flex-row md:justify-between">
-          {line}
-          <p className="label text-muted">Curated objects · Est. 2026</p>
+        <div className="mt-16 text-center md:mt-20">
+          <p className="text-[10px] uppercase tracking-[0.35em]">
+            Little pieces of everyday beauty
+          </p>
+
+          <Link href="/" aria-label="MOSAIC Home">
+            <div className="select-none font-serif text-[18vw] font-bold leading-none tracking-[-0.07em] text-[#F5C7DD] transition-opacity hover:opacity-80 md:text-[14vw]">
+              MOSAIC
+            </div>
+          </Link>
         </div>
+
+        <div className="mt-6 flex flex-col items-center gap-4 border-t border-[#24354A]/20 py-6 md:flex-row md:justify-between">
+          {line}
+
+          <p className="shrink-0 text-[10px] uppercase tracking-widest">
+            Curated objects · Est. 2026
+          </p>
+        </div>
+
       </div>
     </footer>
   );
